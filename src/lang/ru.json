@@ -1,0 +1,35 @@
+{
+    "hi": "Привет",
+
+    "in_anticipation": "В ожиданий",
+    "in_the_freeze": "В заморозке",
+    "in_progress": "В работе",
+    "in_check": "В проверке",
+    "in_testing": "В тестирований",
+    "completed": "Выполнена",
+
+    "home": "Главное",
+    "login": "Логин",
+    "password": "Пароль",
+
+    "enter_data": "Введите данные...",
+    "required_field": "Обязательное поле",
+    "max_length": "Максимальная длина",
+    "min_length": "Минимальная длина",
+    "this_is_email": "Это электронная почта",
+
+    "welcome": "Добро пожаловать!",
+    "please_enter_your_details": "Пожалуйста, введите свои данные.",
+    "forgot_your_password": "Забыли пароль?",
+    "enter": "Войти",
+
+    "password_recovery": "Восстановление пароля",
+    "enter_your_account_login_receive_email_with_new_password": "Введите логин вашего аккаунта для получения письма с новым паролем.",
+    "return_login": "Вернуться в авторизацию",
+    "restore": "Восстановить",
+
+    "letter_sent": "Письмо отправлено",
+    "email_with_password_has_been_sent_to": "Письмо с новым паролем отправлено на почту",
+
+    "---": "---"
+}
