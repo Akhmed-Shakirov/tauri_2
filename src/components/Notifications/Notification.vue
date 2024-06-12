@@ -42,11 +42,13 @@ watchDebounced(() => props.timer, () => {
         text-align: left;
         font-size: 16px;
         font-weight: 500;
+        color: #ffffff;
     }
 
     .icon {
         width: 24px;
         height: 24px;
+        color: #ffffff;
     }
 
     .xmark {

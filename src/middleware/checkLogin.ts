@@ -1,8 +1,9 @@
 import { useRouter } from 'vue-router'
-import { useStorage } from '@vueuse/core'
+import { useToken, storeToRefs } from '../stores'
 
 const checkLogin = (to: any) => {
-    const is_auth = useStorage('is_auth', false)
+    const { is_auth } = storeToRefs(useToken())
+
     const router = useRouter()
 
     if (to.path !== '/login' && !is_auth.value) {

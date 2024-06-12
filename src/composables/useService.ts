@@ -32,7 +32,6 @@ const useService = (api: string | any[], method: string = 'GET', helper?: { stat
 
             if (method == 'PATCH' && Object.keys(helper?.old_item)?.length) {
                 item = findDifferences(helper?.old_item, helper?.item)
-                console.log(item)
             }
 
             let result = await useFetch(api, method, item)

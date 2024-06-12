@@ -10,11 +10,11 @@ const isPagination = false
 // End Pagination
 
 // Default Variables
-const BASEURL = 'https://jsonplaceholder.typicode.com'
+const BASEURL = 'http://10.10.77.180:8000'
 
 const key = {
-    refresh: 'refreshToken',
-    access: 'accessToken'
+    refresh: 'refresh',
+    access: 'access'
 }
 
 // Query to filter
@@ -57,10 +57,13 @@ const getVerificationRequest = (data: any) => {
 }
 // Request
 const fetchData = (apiData: string, paramsData: any, notification?: string): any => {
-    const { access_token, refresh_token } = storeToRefs(useToken())
+    const { access_token, refresh_token, city_access_token } = storeToRefs(useToken())
     const { setNotification } = useNotifications()
 
-    return fetch(`${BASEURL}/${apiData}`, paramsData).then(async (res) => {
+
+    console.log('test start')
+
+    fetch(`${BASEURL}/${apiData}`, paramsData).then(async (res) => {
         // Everything is fine
         if (!res.ok && res.status !== 401) {
             setNotification({ value: 'warning', text: 'Everything is fine' })
@@ -76,6 +79,7 @@ const fetchData = (apiData: string, paramsData: any, notification?: string): any
         // Invalid token
         if (res.status === 401) {
             setNotification({ value: 'warning', text: 'Invalid token' })
+            console.log('123333', res)
             return fetch(`${BASEURL}/auth/refresh/`, {
                 method: 'POST',
                 headers: {
@@ -98,15 +102,16 @@ const fetchData = (apiData: string, paramsData: any, notification?: string): any
                 }
 
                 paramsData.headers.Authorization = `Bearer ${access_token.value}`
-
+                paramsData.headers['City-Token'] = city_access_token.value
                 return fetchData(apiData, paramsData, notification)
             })
         }
-
+        console.log('test good')
         // Results
         setNotification({ value: 'success', text: notification ?? 'Success' })
         return await res.json()
     }).catch(async (error) => {
+        console.log('test error')
         setNotification({ value: 'danger', text: error ?? 'Danger' })
         return await error
     })
@@ -119,7 +124,7 @@ const useFetch = async (
     data = {},
     notification?: string
 ) => {
-    const { access_token } = storeToRefs(useToken())
+    const { access_token, city_access_token } = storeToRefs(useToken())
     let api
 
     method = method.toLocaleUpperCase()
@@ -128,13 +133,19 @@ const useFetch = async (
         method,
         headers: {
             'Content-Type': 'application/json',
-            Authorization: ''
+            'Authorization': '',
+            'City-Token': ''
         }
     }
 
     // Token verification
     if (!!access_token.value) { // true: Additional check even if there is a token
         params.headers.Authorization = (true ? `Bearer ${access_token.value}` : undefined)
+    }
+
+    // Token verification
+    if (!!city_access_token.value) { // true: Additional check even if there is a token
+        params.headers['City-Token'] = (true ? city_access_token.value : undefined)
     }
 
     // Request body

@@ -74,9 +74,6 @@ const types = computed<string>(() => {
     }
 
     for (const iterator of ['number', 'email', 'password']) {
-
-        console.log(iterator)
-
         const type = useFindItem(iterator, props.validator)
 
         if (type) return type

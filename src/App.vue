@@ -8,11 +8,15 @@
 
 <script setup lang="ts">
 import { Notifications } from './components'
-
+import { useToken } from './stores'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTitle } from '@vueuse/core'
+
+const { load, beforeunload } = useToken()
+window.addEventListener('load', () => load())
+window.addEventListener('beforeunload', () => beforeunload())
 
 const route = useRoute()
 const { t } = useI18n()

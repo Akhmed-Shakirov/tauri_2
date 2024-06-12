@@ -10,10 +10,10 @@
         </div>
 
         <Form v-model="formHendler">
-            <div class="login__form">
+            <div class="login__form" v-if="count !== 4">
                 <Input
-                    v-model="item.login"
-                    :validator="validator.login"
+                    v-model="item.username"
+                    :validator="validator.username"
                     placeholder="login"
                     v-if="count !== 3"
                 />
@@ -31,7 +31,20 @@
                 </a>
             </div>
 
-            <Button :value="text.button[count]" isSubmit />
+            <div class="login__form" v-else>
+                <Radio
+                    v-model="city_id"
+                    :selects="cities"
+                    :keys="['name', 'id']"
+                    :validator="validator.city_id"
+                />
+            </div>
+
+            <Button
+                v-if=text.button[count]
+                :value="text.button[count]"
+                isSubmit
+            />
         </Form>
 
         <span>v2.27 <br> ac75ed5169d1f91a</span>
@@ -39,58 +52,91 @@
 </template>
 
 <script setup lang="ts">
-import { Form, Button, Input } from '../components'
-import { useRouter } from 'vue-router'
-import { useStorage } from '@vueuse/core'
-import { ref } from 'vue'
+import { Form, Button, Input, Radio } from '../components'
+import { useToken, storeToRefs } from '../stores'
+import { useFetch } from '../composables'
+import { ref, watch } from 'vue'
 
-const access_token = useStorage('access_token', '')
-const refresh_token = useStorage('refresh_token', '')
-const is_auth = useStorage('is_auth', false)
-const router = useRouter()
+const { access_token } = storeToRefs(useToken())
+const { setAuth, setCity } = useToken()
 
 const count = ref<number>(1)
 const text = ref<any>({
     h3: {
         1: 'welcome',
         2: 'password_recovery',
-        3: 'letter_sent'
+        3: 'letter_sent',
+        4: 'select_city'
     },
     p: {
         1: 'please_enter_your_details',
         2: 'enter_your_account_login_receive_email_with_new_password',
-        3: 'email_with_password_has_been_sent_to'
+        3: 'email_with_password_has_been_sent_to',
+        4: ''
     },
     a: {
         1: 'forgot_your_password',
         2: 'return_login',
-        3: ''
+        3: '',
+        4: ''
     },
     button: {
         1: 'enter',
         2: 'restore',
-        3: 'return_login'
+        3: 'return_login',
+        4: ''
+    }
+})
+const cities = ref<any[]>([])
+const city_id = ref<string>('')
+watch(city_id, (v) => {
+    if (v && count.value == 4) {
+        city(v)
     }
 })
 
 const item = ref<any>({
-    login: '',
+    username: '',
     password: ''
 })
 const validator = {
-    login: ['required', 'email'],
-    password: ['required']
+    username: ['required'],
+    password: ['required'],
+    city_id: ['']
 }
 
-const login = () => {
+const city = async (id: string) => {
+    try {
+        const city = await useFetch('auth/city_token/', 'post', {
+            auth_token: access_token.value,
+            city_id: id,
+            is_remember: true
+        })
+
+        setCity(city)
+    } catch (error) {
+        console.log('error city_token', error)
+    }
+}
+const login = async () => {
     if (count.value == 1) {
-        refresh_token.value = 'token'
-        access_token.value = 'token'
-        is_auth.value = true
-        router.push('/')
+        const auth = await useFetch('auth/token/', 'post', { ...item.value, is_remember: true })
+        setAuth(auth)
+        cities.value = auth?.user?.city_user.map((el: any) => ({ ...el.city }))
+
+        if (cities.value?.length == 1) {
+            city(cities.value[0].id)
+        }
+
+        if (cities.value?.length > 1) {
+            count.value = 4
+        }
+
+        console.log('auth', auth)
 
         return
     }
+
     if (count.value == 2) {
         count.value++
     } else {
@@ -156,6 +202,7 @@ const formHendler = ref({
 
     p {
         font-size: 14px;
+        line-height: 16.5px;
         color: #42474E;
     }
 
